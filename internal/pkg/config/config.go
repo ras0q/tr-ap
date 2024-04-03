@@ -1,37 +1,29 @@
 package config
 
 import (
+	"cmp"
 	"fmt"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
 )
 
-func getEnv(key, defaultValue string) string {
-	v, ok := os.LookupEnv(key)
-	if !ok {
-		return defaultValue
-	}
-
-	return v
-}
-
 func AppAddr() string {
-	return getEnv("APP_ADDR", ":8080")
+	return cmp.Or(os.Getenv("APP_ADDR"), ":8080")
 }
 
 func MySQL() *mysql.Config {
 	c := mysql.NewConfig()
 
-	c.User = getEnv("DB_USER", "root")
-	c.Passwd = getEnv("DB_PASSWORD", "pass")
-	c.Net = getEnv("DB_NET", "tcp")
+	c.User = cmp.Or(os.Getenv("DB_USER"), "root")
+	c.Passwd = cmp.Or(os.Getenv("DB_PASSWORD"), "pass")
+	c.Net = cmp.Or(os.Getenv("DB_NET"), "tcp")
 	c.Addr = fmt.Sprintf(
 		"%s:%s",
-		getEnv("DB_HOST", "localhost"),
-		getEnv("DB_PORT", "3306"),
+		cmp.Or(os.Getenv("DB_HOST"), "localhost"),
+		cmp.Or(os.Getenv("DB_PORT"), "3306"),
 	)
-	c.DBName = getEnv("DB_NAME", "app")
+	c.DBName = cmp.Or(os.Getenv("DB_NAME"), "app")
 	c.Collation = "utf8mb4_general_ci"
 	c.AllowNativePasswords = true
 
