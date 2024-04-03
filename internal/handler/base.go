@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -30,6 +31,19 @@ func (h *Handler) GetService(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, service)
 }
+
+// GET /.well-known/host-meta
+func (h *Handler) GetHostMeta(c echo.Context) error {
+	hostMeta := fmt.Sprintf(`<?xml version="1.0"?>
+<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+	<Link rel="lrdd" type="application/xrd+xml" template="%s/.well-known/webfinger?resource={uri}" />
+</XRD>`,
+		h.baseURL,
+	)
+
+	return c.XML(http.StatusOK, hostMeta)
+}
+
 
 // GET /.well-known/webfinger?resource={resource}
 func (h *Handler) GetWebFinger(c echo.Context) error {

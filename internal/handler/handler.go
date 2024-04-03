@@ -21,6 +21,7 @@ func New(baseURL ap.IRI, repo *repository.Repository) *Handler {
 
 func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.GetService)
+	e.GET("/.well-known/host-meta", h.GetHostMeta)
 	e.GET("/.well-known/webfinger", h.GetWebFinger)
 
 	e.GET("/ping", h.Ping)
