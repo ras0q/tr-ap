@@ -6,6 +6,7 @@ import (
 	"tr-ap/internal/pkg/config"
 	"tr-ap/internal/repository"
 
+	ap "github.com/go-ap/activitypub"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -34,9 +35,8 @@ func main() {
 	repo := repository.New(db)
 
 	// setup routes
-	h := handler.New(repo)
-	v1API := e.Group("/api/v1")
-	h.SetupRoutes(v1API)
+	h := handler.New(ap.IRI("https://tr-ap.trap.show"), repo)
+	h.SetupRoutes(e)
 
 	e.Logger.Fatal(e.Start(config.AppAddr()))
 }

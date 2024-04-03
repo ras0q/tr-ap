@@ -3,31 +3,33 @@ package handler
 import (
 	"tr-ap/internal/repository"
 
+	ap "github.com/go-ap/activitypub"
 	"github.com/labstack/echo/v4"
 )
 
 type Handler struct {
-	repo *repository.Repository
+	baseURL ap.IRI
+	repo    *repository.Repository
 }
 
-func New(repo *repository.Repository) *Handler {
+func New(baseURL ap.IRI, repo *repository.Repository) *Handler {
 	return &Handler{
-		repo: repo,
+		baseURL: baseURL,
+		repo:    repo,
 	}
 }
 
-func (h *Handler) SetupRoutes(api *echo.Group) {
-	// ping API
-	pingAPI := api.Group("/ping")
-	{
-		pingAPI.GET("", h.Ping)
-	}
+func (h *Handler) SetupRoutes(e *echo.Echo) {
+	e.GET("/", h.GetService)
+	e.GET("/.well-known/webfinger", h.GetWebFinger)
 
-	// user API
-	userAPI := api.Group("/users")
-	{
-		userAPI.GET("", h.GetUsers)
-		userAPI.POST("", h.CreateUser)
-		userAPI.GET("/:userID", h.GetUser)
-	}
+	e.GET("/ping", h.Ping)
+
+	e.GET("/u", h.GetUsers)
+	e.GET("/u/:userID", h.GetUser)
+	e.GET("/u/:userID/inbox", h.GetUserInbox)
+	e.GET("/u/:userID/outbox", h.GetUserOutbox)
+	e.GET("/u/:userID/following", h.GetUserFollowing)
+	e.GET("/u/:userID/followers", h.GetUserFollowers)
+	e.GET("/u/:userID/liked", h.GetUserLiked)
 }

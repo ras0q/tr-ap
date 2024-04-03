@@ -1,103 +1,90 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
-	"tr-ap/internal/repository"
 
-	vd "github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
-	"github.com/google/uuid"
+	ap "github.com/go-ap/activitypub"
 	"github.com/labstack/echo/v4"
 )
 
-// スキーマ定義
-type (
-	GetUsersResponse []GetUserResponse
-
-	GetUserResponse struct {
-		ID    uuid.UUID `json:"id"`
-		Name  string    `json:"name"`
-		Email string    `json:"email"`
-	}
-
-	CreateUserRequest struct {
-		Name  string `json:"name"`
-		Email string `json:"email"`
-	}
-
-	CreateUserResponse struct {
-		ID uuid.UUID `json:"id"`
-	}
-)
-
-// GET /api/v1/users
-func (h *Handler) GetUsers(c echo.Context) error {
-	users, err := h.repo.GetUsers(c.Request().Context())
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
-	}
-
-	res := make(GetUsersResponse, len(users))
-	for i, user := range users {
-		res[i] = GetUserResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
-		}
-	}
-
-	return c.JSON(http.StatusOK, res)
+// GET /u
+func (h *Handler) GetUsers(_ echo.Context) error {
+	return nil
 }
 
-// POST /api/v1/users
-func (h *Handler) CreateUser(c echo.Context) error {
-	req := new(CreateUserRequest)
-	if err := c.Bind(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").SetInternal(err)
-	}
-
-	err := vd.ValidateStruct(
-		req,
-		vd.Field(&req.Name, vd.Required),
-		vd.Field(&req.Email, vd.Required, is.Email),
-	)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("invalid request body: %w", err)).SetInternal(err)
-	}
-
-	userID, err := h.repo.CreateUser(c.Request().Context(), repository.CreateUserParams{
-		Name:  req.Name,
-		Email: req.Email,
-	})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
-	}
-
-	res := CreateUserResponse{
-		ID: userID,
-	}
-
-	return c.JSON(http.StatusOK, res)
-}
-
-// GET /api/v1/users/:userID
+// GET /u/:userID
 func (h *Handler) GetUser(c echo.Context) error {
-	userID, err := uuid.Parse(c.Param("userID"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid userID").SetInternal(err)
+	userID := c.Param("userID")
+	userIRI := h.baseURL.AddPath("u", userID)
+	user := ap.Actor{
+		ID:        userIRI,
+		Type:      ap.PersonType,
+		Inbox:     userIRI.AddPath("inbox"),
+		Outbox:    userIRI.AddPath("outbox"),
+		Following: userIRI.AddPath("following"),
+		Followers: userIRI.AddPath("followers"),
+		Liked:     userIRI.AddPath("liked"),
 	}
 
-	user, err := h.repo.GetUser(c.Request().Context(), userID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
+	return c.JSON(http.StatusOK, user)
+}
+
+// GET /u/:userID/inbox
+func (h *Handler) GetUserInbox(c echo.Context) error {
+	userID := c.Param("userID")
+	userIRI := h.baseURL.AddPath("u", userID)
+	inbox := ap.OrderedCollection{
+		ID:   userIRI.AddPath("inbox"),
+		Type: ap.OrderedCollectionType,
 	}
 
-	res := GetUserResponse{
-		ID:    user.ID,
-		Name:  user.Name,
-		Email: user.Email,
+	return c.JSON(http.StatusOK, inbox)
+}
+
+// GET /u/:userID/outbox
+func (h *Handler) GetUserOutbox(c echo.Context) error {
+	userID := c.Param("userID")
+	userIRI := h.baseURL.AddPath("u", userID)
+	outbox := ap.OrderedCollection{
+		ID:   userIRI.AddPath("outbox"),
+		Type: ap.OrderedCollectionType,
 	}
 
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusOK, outbox)
+}
+
+// GET /u/:userID/following
+func (h *Handler) GetUserFollowing(c echo.Context) error {
+	userID := c.Param("userID")
+	userIRI := h.baseURL.AddPath("u", userID)
+	following := ap.Collection{
+		ID:   userIRI.AddPath("following"),
+		Type: ap.CollectionType,
+	}
+
+	return c.JSON(http.StatusOK, following)
+}
+
+// GET /u/:userID/followers
+func (h *Handler) GetUserFollowers(c echo.Context) error {
+	userID := c.Param("userID")
+	userIRI := h.baseURL.AddPath("u", userID)
+	followers := ap.Collection{
+		ID:   userIRI.AddPath("followers"),
+		Type: ap.CollectionType,
+	}
+
+	return c.JSON(http.StatusOK, followers)
+}
+
+// GET /u/:userID/liked
+func (h *Handler) GetUserLiked(c echo.Context) error {
+	userID := c.Param("userID")
+	userIRI := h.baseURL.AddPath("u", userID)
+	liked := ap.Collection{
+		ID:   userIRI.AddPath("liked"),
+		Type: ap.CollectionType,
+	}
+
+	return c.JSON(http.StatusOK, liked)
 }
