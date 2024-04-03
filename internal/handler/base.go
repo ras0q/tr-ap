@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 
 	ap "github.com/go-ap/activitypub"
 	"github.com/labstack/echo/v4"
@@ -37,13 +38,14 @@ func (h *Handler) GetWebFinger(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "resource query parameter is required")
 	}
 
+	userID := strings.Split(strings.TrimPrefix(resource, "acct:"), "@")[0]
 	webFinger := map[string]interface{}{
 		"subject": resource,
 		"links": []map[string]interface{}{
 			{
 				"rel":  "self",
 				"type": "application/activity+json",
-				"href": h.baseURL.AddPath("actors", resource),
+				"href": h.baseURL.AddPath("u", userID),
 			},
 		},
 	}
