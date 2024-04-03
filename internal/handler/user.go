@@ -21,7 +21,7 @@ func (h *Handler) GetUser(c echo.Context) error {
 		Type:              ap.PersonType,
 		Name:              ap.DefaultNaturalLanguageValue(userID),
 		PreferredUsername: ap.DefaultNaturalLanguageValue(userID),
-		URL:       userIRI,
+		URL:               userIRI,
 		Icon: ap.Image{
 			Type:      ap.ImageType,
 			MediaType: "image/png",
