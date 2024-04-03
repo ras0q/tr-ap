@@ -17,8 +17,15 @@ func (h *Handler) GetUser(c echo.Context) error {
 	userID := c.Param("userID")
 	userIRI := h.baseURL.AddPath("u", userID)
 	user := ap.Actor{
-		ID:        userIRI,
-		Type:      ap.PersonType,
+		ID:                userIRI,
+		Type:              ap.PersonType,
+		Name:              ap.DefaultNaturalLanguageValue(userID),
+		PreferredUsername: ap.DefaultNaturalLanguageValue(userID),
+		Icon: ap.Image{
+			Type:      ap.ImageType,
+			MediaType: "image/png",
+			URL:       ap.IRI("https://placehold.jp/150x150.png"),
+		},
 		Inbox:     userIRI.AddPath("inbox"),
 		Outbox:    userIRI.AddPath("outbox"),
 		Following: userIRI.AddPath("following"),
