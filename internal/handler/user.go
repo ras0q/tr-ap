@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"github.com/ras0q/go-backend-template/internal/repository"
 	"net/http"
+	"tr-ap/internal/repository"
 
 	vd "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"

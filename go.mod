@@ -1,4 +1,4 @@
-module github.com/ras0q/go-backend-template
+module tr-ap
 
 go 1.22
 

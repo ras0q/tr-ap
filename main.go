@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/ras0q/go-backend-template/internal/handler"
-	"github.com/ras0q/go-backend-template/internal/migration"
-	"github.com/ras0q/go-backend-template/internal/pkg/config"
-	"github.com/ras0q/go-backend-template/internal/repository"
+	"tr-ap/internal/handler"
+	"tr-ap/internal/migration"
+	"tr-ap/internal/pkg/config"
+	"tr-ap/internal/repository"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
