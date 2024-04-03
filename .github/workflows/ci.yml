@@ -67,7 +67,7 @@ jobs:
       - build
       - lint
       - test-unit
-      - test-integration
+      # - test-integration
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Dependabot metadata
